@@ -4,8 +4,9 @@ import { mockDB } from '@/data/mock';
 import { Star, Clock, MapPin } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { stores } from '@/core-stores';
+import { useThemeStyles } from '@/hooks/useThemeStyles';
+import { observer } from 'mobx-react-lite';
 
-// Define the type for a business object
 interface Business {
   id: string;
   name: string;
@@ -18,9 +19,11 @@ interface Business {
   services: string[];
 }
 
-export default function HomeScreen() {
+const HomeScreen = observer(() => {
+  
   const router = useRouter();
   const { shopStore } = stores;
+  const { colors, isDark } = useThemeStyles();
 
   const [refreshing, setRefreshing] = useState(false);
   const [selectedType, setSelectedType] = useState<'all' | 'barbershop' | 'clinic' | 'carwash'>('all');
@@ -38,18 +41,13 @@ export default function HomeScreen() {
   }, []);
 
   useEffect(() => {
-    // Disable hardware back button on Android for this screen
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-      // Returning true prevents the default back button behavior (navigating back)
-      return true;
-    });
-
-    // Cleanup the listener when the component unmounts
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true);
     return () => backHandler.remove();
   }, []);
+
   const renderBusinessCard = ({ item }: { item: Business }) => (
     <TouchableOpacity
-      style={styles.card}
+      style={[styles.card, { backgroundColor: colors.card }]}
       onPress={() => {
         shopStore.updateShopData(item);
         router.push('/(tabs)/home/storeDetails');
@@ -58,40 +56,40 @@ export default function HomeScreen() {
       <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
       <View style={styles.cardContent}>
         <View style={styles.cardHeader}>
-          <Text style={styles.businessName}>{item.name}</Text>
+          <Text style={[styles.businessName, { color: colors.text }]}>{item.name}</Text>
           <View style={styles.ratingContainer}>
-            <Star size={16} color="#f59e0b" fill="#f59e0b" />
-            <Text style={styles.rating}>{item.rating.toFixed(1)}</Text>
-            <Text style={styles.totalRatings}>({item.totalRatings})</Text>
+            <Star size={16} color={colors.accent} fill={colors.accent} />
+            <Text style={[styles.rating, { color: colors.text }]}>{item.rating.toFixed(1)}</Text>
+            <Text style={[styles.totalRatings, { color: colors.subtext }]}>({item.totalRatings})</Text>
           </View>
         </View>
 
-        <Text style={styles.description} numberOfLines={2}>
+        <Text style={[styles.description, { color: colors.subtext }]} numberOfLines={2}>
           {item.description}
         </Text>
 
         <View style={styles.infoContainer}>
           <View style={styles.info}>
-            <Clock size={16} color="#666" />
-            <Text style={styles.infoText}>
+            <Clock size={16} color={colors.icon} />
+            <Text style={[styles.infoText, { color: colors.subtext }]}>
               {item.operatingHours.open} - {item.operatingHours.close}
             </Text>
           </View>
           <View style={styles.info}>
-            <MapPin size={16} color="#666" />
-            <Text style={styles.infoText}>{item.address}</Text>
+            <MapPin size={16} color={colors.icon} />
+            <Text style={[styles.infoText, { color: colors.subtext }]}>{item.address}</Text>
           </View>
         </View>
 
         <View style={styles.servicesContainer}>
           {item.services.slice(0, 3).map((service, index) => (
-            <View key={index} style={styles.serviceTag}>
-              <Text style={styles.serviceText}>{service}</Text>
+            <View key={index} style={[styles.serviceTag, { backgroundColor: isDark ? '#1e3a8a' : '#e0f2fe' }]}>
+              <Text style={[styles.serviceText, { color: colors.accent }]}>{service}</Text>
             </View>
           ))}
           {item.services.length > 3 && (
-            <View style={styles.serviceTag}>
-              <Text style={styles.serviceText}>+{item.services.length - 3}</Text>
+            <View style={[styles.serviceTag, { backgroundColor: isDark ? '#1e3a8a' : '#e0f2fe' }]}>
+              <Text style={[styles.serviceText, { color: colors.accent }]}>+{item.services.length - 3}</Text>
             </View>
           )}
         </View>
@@ -100,45 +98,32 @@ export default function HomeScreen() {
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Nearby Services</Text>
-        <Text style={styles.subtitle}>Find services in {pincode}</Text>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
+        <Text style={[styles.title, { color: colors.accent }]}>Nearby Services</Text>
+        <Text style={[styles.subtitle, { color: colors.subtext }]}>Find services in {pincode}</Text>
       </View>
 
-      <View style={styles.filterContainer}>
-        <TouchableOpacity
-          style={[styles.filterButton, selectedType === 'all' && styles.filterButtonActive]}
-          onPress={() => setSelectedType('all')}
-        >
-          <Text style={[styles.filterText, selectedType === 'all' && styles.filterTextActive]}>
-            All
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.filterButton, selectedType === 'barbershop' && styles.filterButtonActive]}
-          onPress={() => setSelectedType('barbershop')}
-        >
-          <Text style={[styles.filterText, selectedType === 'barbershop' && styles.filterTextActive]}>
-            Barbershops
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.filterButton, selectedType === 'clinic' && styles.filterButtonActive]}
-          onPress={() => setSelectedType('clinic')}
-        >
-          <Text style={[styles.filterText, selectedType === 'clinic' && styles.filterTextActive]}>
-            Clinics
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.filterButton, selectedType === 'carwash' && styles.filterButtonActive]}
-          onPress={() => setSelectedType('carwash')}
-        >
-          <Text style={[styles.filterText, selectedType === 'carwash' && styles.filterTextActive]}>
-            Car wash
-          </Text>
-        </TouchableOpacity>
+      <View style={[styles.filterContainer, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
+        {['all', 'barbershop', 'clinic', 'carwash'].map((type) => (
+          <TouchableOpacity
+            key={type}
+            style={[
+              styles.filterButton,
+              selectedType === type && { backgroundColor: colors.accent },
+            ]}
+            onPress={() => setSelectedType(type as any)}
+          >
+            <Text
+              style={[
+                styles.filterText,
+                selectedType === type && { color: '#fff' },
+              ]}
+            >
+              {type === 'all' ? 'All' : type.charAt(0).toUpperCase() + type.slice(1)}
+            </Text>
+          </TouchableOpacity>
+        ))}
       </View>
 
       <FlatList
@@ -146,44 +131,37 @@ export default function HomeScreen() {
         renderItem={renderBusinessCard}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
-        numColumns={Platform.OS === 'web' ? 2 : 1} // Use 2 columns for web, 1 for mobile
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        numColumns={Platform.OS === 'web' ? 2 : 1}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       />
     </View>
   );
-}
+});
+export default HomeScreen
 
+// Keep the style values that don’t need theme dynamic (layout, spacing)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
     paddingBottom: process.env.EXPO_OS === 'ios' ? 80 : 0,
   },
   header: {
     padding: 20,
-    backgroundColor: '#fff',
     borderBottomWidth: 1,
-    borderBottomColor: '#e1e3e6',
   },
   title: {
     fontFamily: 'Inter-Bold',
     fontSize: 28,
-    color: '#1a73e8',
     marginBottom: 4,
   },
   subtitle: {
     fontFamily: 'Inter-Regular',
     fontSize: 16,
-    color: '#666',
   },
   filterContainer: {
     flexDirection: 'row',
     padding: 12,
-    backgroundColor: '#fff',
     borderBottomWidth: 1,
-    borderBottomColor: '#e1e3e6',
   },
   filterButton: {
     paddingVertical: 8,
@@ -192,23 +170,16 @@ const styles = StyleSheet.create({
     marginRight: 8,
     backgroundColor: '#f8f9fa',
   },
-  filterButtonActive: {
-    backgroundColor: '#1a73e8',
-  },
   filterText: {
     fontFamily: 'Inter-Medium',
     fontSize: 14,
     color: '#666',
-  },
-  filterTextActive: {
-    color: '#fff',
   },
   list: {
     padding: 16,
     gap: 16,
   },
   card: {
-    backgroundColor: '#fff',
     borderRadius: 12,
     overflow: 'hidden',
     elevation: 2,
@@ -216,9 +187,9 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    width: Platform.OS === 'web' ? '49%' : '100%', // 50% width for web
+    width: Platform.OS === 'web' ? '49%' : '100%',
     marginBottom: 16,
-    marginRight:'1%'
+    marginRight: '1%',
   },
   cardImage: {
     width: '100%',
@@ -237,7 +208,6 @@ const styles = StyleSheet.create({
   businessName: {
     fontFamily: 'Inter-SemiBold',
     fontSize: 18,
-    color: '#1a1a1a',
     flex: 1,
   },
   ratingContainer: {
@@ -248,17 +218,14 @@ const styles = StyleSheet.create({
   rating: {
     fontFamily: 'Inter-SemiBold',
     fontSize: 14,
-    color: '#1a1a1a',
   },
   totalRatings: {
     fontFamily: 'Inter-Regular',
     fontSize: 14,
-    color: '#666',
   },
   description: {
     fontFamily: 'Inter-Regular',
     fontSize: 14,
-    color: '#666',
     marginBottom: 12,
   },
   infoContainer: {
@@ -273,7 +240,6 @@ const styles = StyleSheet.create({
   infoText: {
     fontFamily: 'Inter-Regular',
     fontSize: 14,
-    color: '#666',
   },
   servicesContainer: {
     flexDirection: 'row',
@@ -281,7 +247,6 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   serviceTag: {
-    backgroundColor: '#f0f9ff',
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 16,
@@ -289,6 +254,5 @@ const styles = StyleSheet.create({
   serviceText: {
     fontFamily: 'Inter-Medium',
     fontSize: 12,
-    color: '#1a73e8',
   },
 });

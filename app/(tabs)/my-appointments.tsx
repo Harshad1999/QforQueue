@@ -8,15 +8,18 @@ import {
   Platform,
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useThemeStyles } from '@/hooks/useThemeStyles';
+import { observer } from 'mobx-react-lite';
 
-const screenWidth = Dimensions.get('window').width;
+const MyBookingsScreen = observer(() => {
+  const { colors, isDark } = useThemeStyles();
 
-const MyBookingsScreen = () => {
   const currentBooking = {
     id: 'CB12345',
     shopName: 'Royal Barbershop',
     category: 'Barber',
     tokenNumber: 12,
+    ongoingTokenNumber: 10, // NEW: current token being served
     estimatedTime: '15 mins',
     status: 'Active',
     time: '04 Apr 2025, 3:30 PM',
@@ -52,22 +55,44 @@ const MyBookingsScreen = () => {
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case 'Barber':
-        return <MaterialCommunityIcons name="scissors-cutting" size={20} color="#007AFF" />;
+        return (
+          <MaterialCommunityIcons
+            name="scissors-cutting"
+            size={20}
+            color={colors.accent}
+          />
+        );
       case 'Clinic':
-        return <MaterialCommunityIcons name="hospital-box-outline" size={20} color="#00C896" />;
+        return (
+          <MaterialCommunityIcons
+            name="hospital-box-outline"
+            size={20}
+            color={colors.accent}
+          />
+        );
       case 'Car Wash':
-        return <MaterialCommunityIcons name="car-wash" size={20} color="#FFA500" />;
+        return (
+          <MaterialCommunityIcons
+            name="car-wash"
+            size={20}
+            color={colors.accent}
+          />
+        );
       default:
         return null;
     }
   };
 
-  const renderBookingCard = (booking: typeof currentBooking | typeof historyBookings[0]) => (
-    <View style={styles.card}>
+  const renderBookingCard = (
+    booking: typeof currentBooking | typeof historyBookings[0]
+  ) => (
+    <View style={[styles.card, { backgroundColor: colors.card }]}>
       <View style={styles.cardHeader}>
         <View style={styles.iconTitle}>
           {getCategoryIcon(booking.category)}
-          <Text style={styles.shopName}>{booking.shopName}</Text>
+          <Text style={[styles.shopName, { color: colors.text }]}>
+            {booking.shopName}
+          </Text>
         </View>
         <View
           style={[
@@ -75,8 +100,10 @@ const MyBookingsScreen = () => {
             {
               backgroundColor:
                 booking.status === 'Active'
-                  ? '#D1F5E0'
-                  : '#ECECEC',
+                  ? isDark
+                    ? '#14532d'
+                    : '#D1F5E0'
+                  : colors.border,
             },
           ]}
         >
@@ -84,8 +111,8 @@ const MyBookingsScreen = () => {
             style={{
               color:
                 booking.status === 'Active'
-                  ? '#00C896'
-                  : '#666',
+                  ? colors.accent
+                  : colors.subtext,
               fontSize: 12,
               fontWeight: '500',
             }}
@@ -94,51 +121,115 @@ const MyBookingsScreen = () => {
           </Text>
         </View>
       </View>
-      <Text style={styles.detailText}>
-        <MaterialCommunityIcons name="ticket-confirmation-outline" size={16} /> Token #{booking.tokenNumber}
-      </Text>
-      <Text style={styles.detailText}>
-        <Ionicons name="calendar-outline" size={16} /> {booking.time}
-      </Text>
-      {booking.estimatedTime && (
-        <Text style={styles.detailText}>
-          <Ionicons name="time-outline" size={16} /> Est. Wait: {booking.estimatedTime}
+
+      {booking.status === 'Active' ? (
+        <View style={styles.tokenRow}>
+          <View
+            style={[styles.tokenBox, { backgroundColor: colors.accent + '22' }]}
+          >
+            <Text style={styles.tokenLabel}>Your Token</Text>
+            <Text style={[styles.tokenNumber, { color: colors.accent }]}>
+              #{booking.tokenNumber}
+            </Text>
+          </View>
+          <View
+            style={[
+              styles.tokenBox,
+              {
+                backgroundColor: isDark ? '#1E293B' : '#E0E7FF',
+              },
+            ]}
+          >
+            <Text style={styles.tokenLabel}>Now Serving</Text>
+            <Text
+              style={[
+                styles.tokenNumber,
+                { color: isDark ? '#93C5FD' : '#1D4ED8' },
+              ]}
+            >
+              #{booking.ongoingTokenNumber}
+            </Text>
+          </View>
+        </View>
+      ) : (
+        <View style={styles.infoRow}>
+          <Ionicons
+            name="ticket-outline"
+            size={16}
+            color={colors.icon}
+            style={styles.icon}
+          />
+          <Text style={[styles.detailText, { color: colors.subtext }]}>
+            Token #{booking.tokenNumber}
+          </Text>
+        </View>
+      )}
+
+      <View style={styles.infoRow}>
+        <Ionicons
+          name="calendar-outline"
+          size={16}
+          color={colors.icon}
+          style={styles.icon}
+        />
+        <Text style={[styles.detailText, { color: colors.subtext }]}>
+          {booking.time}
         </Text>
+      </View>
+
+      {booking.estimatedTime && (
+        <View style={styles.infoRow}>
+          <Ionicons
+            name="time-outline"
+            size={16}
+            color={colors.icon}
+            style={styles.icon}
+          />
+          <Text style={[styles.detailText, { color: colors.subtext }]}>
+            Est. Wait: {booking.estimatedTime}
+          </Text>
+        </View>
       )}
     </View>
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {currentBooking ? (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>🟢 Current Booking</Text>
+            <Text style={[styles.sectionTitle, { color: colors.accent }]}>
+              🟢 Current Booking
+            </Text>
             {renderBookingCard(currentBooking)}
           </View>
         ) : (
-          <Text style={styles.noBookingText}>No active bookings</Text>
+          <Text style={[styles.noBookingText, { color: colors.subtext }]}>
+            No active bookings
+          </Text>
         )}
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📜 Booking History</Text>
+          <Text style={[styles.sectionTitle, { color: colors.accent }]}>
+            📜 Booking History
+          </Text>
           {historyBookings.map((item) => (
             <View key={item.id}>{renderBookingCard(item)}</View>
           ))}
         </View>
+
         <View style={{ height: 60 }} />
       </ScrollView>
     </View>
   );
-};
+});
 
 export default MyBookingsScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
-    paddingTop:30
+    paddingTop: 30,
   },
   scrollContent: {
     padding: 16,
@@ -150,10 +241,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     marginBottom: 12,
-    color: '#1E293B',
   },
   card: {
-    backgroundColor: '#FFFFFF',
     padding: 16,
     borderRadius: 16,
     marginBottom: 14,
@@ -167,7 +256,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 12,
   },
   iconTitle: {
     flexDirection: 'row',
@@ -177,22 +266,50 @@ const styles = StyleSheet.create({
   shopName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#111827',
   },
   statusBadge: {
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 20,
   },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 6,
+  },
+  icon: {
+    marginRight: 6,
+  },
   detailText: {
     fontSize: 14,
-    color: '#374151',
-    marginTop: 4,
   },
   noBookingText: {
     textAlign: 'center',
     marginTop: 60,
-    color: '#999',
     fontSize: 16,
+  },
+  tokenRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+    gap: 10,
+  },
+  tokenBox: {
+    flex: 1,
+    borderRadius: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tokenLabel: {
+    fontSize: 13,
+    fontWeight: '500',
+    marginBottom: 4,
+    opacity: 0.7,
+  },
+  tokenNumber: {
+    fontSize: 28,
+    fontWeight: 'bold',
   },
 });

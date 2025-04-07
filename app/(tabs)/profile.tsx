@@ -1,122 +1,147 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TextInput,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons';
+import { useThemeStyles } from '@/hooks/useThemeStyles';
+import { observer } from 'mobx-react-lite';
 
-export default function ProfileScreen() {
+const ProfileScreen = observer(() => {
   const [editMode, setEditMode] = useState(false);
   const [user, setUser] = useState({
     name: 'John Doe',
     email: 'john.doe@example.com',
     mobile: '+91 9876543210',
-    photoUrl: 'https://plus.unsplash.com/premium_photo-1664536392896-cd1743f9c02c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    photoUrl:
+      'https://plus.unsplash.com/premium_photo-1664536392896-cd1743f9c02c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     location: 'Bangalore, India',
     joined: 'Jan 2023',
     appointments: 24,
   });
+
+  const { colors, isDark } = useThemeStyles();
 
   const handleChange = (key: keyof typeof user, value: string) => {
     setUser((prev) => ({ ...prev, [key]: value }));
   };
 
   return (
-    <View style={styles.wrapper}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+    <View style={[styles.wrapper, { backgroundColor: colors.background }]}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Header */}
         <View style={styles.header}>
           <Image source={{ uri: user.photoUrl }} style={styles.avatar} />
           <View style={styles.userInfo}>
             {editMode ? (
               <TextInput
-                style={styles.inputName}
+                style={[styles.inputName, { color: colors.text, borderColor: colors.border }]}
                 value={user.name}
                 onChangeText={(text) => handleChange('name', text)}
               />
             ) : (
-              <Text style={styles.name}>{user.name}</Text>
+              <Text style={[styles.name, { color: colors.text }]}>{user.name}</Text>
             )}
-            <Text style={styles.location}>
-              <Ionicons name="location-outline" size={14} /> {user.location}
+            <Text style={[styles.location, { color: colors.subtext }]}>
+              <Ionicons name="location-outline" size={14} color={colors.icon} /> {user.location}
             </Text>
           </View>
           <TouchableOpacity onPress={() => setEditMode(!editMode)}>
-            <Feather name={editMode ? 'check' : 'edit'} size={20} color="#007AFF" />
+            <Feather name={editMode ? 'check' : 'edit'} size={20} color={colors.accent} />
           </TouchableOpacity>
         </View>
 
         {/* Contact Info */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Contact Info</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Contact Info</Text>
           <View style={styles.infoRow}>
-            <MaterialIcons name="email" size={20} color="#555" />
+            <MaterialIcons name="email" size={20} color={colors.icon} />
             {editMode ? (
               <TextInput
-                style={styles.input}
+                style={[styles.input, { color: colors.text, borderColor: colors.border }]}
                 value={user.email}
                 onChangeText={(text) => handleChange('email', text)}
                 keyboardType="email-address"
               />
             ) : (
-              <Text style={styles.infoText}>{user.email}</Text>
+              <Text style={[styles.infoText, { color: colors.text }]}>{user.email}</Text>
             )}
           </View>
           <View style={styles.infoRow}>
-            <Feather name="phone" size={20} color="#555" />
+            <Feather name="phone" size={20} color={colors.icon} />
             {editMode ? (
               <TextInput
-                style={styles.input}
+                style={[styles.input, { color: colors.text, borderColor: colors.border }]}
                 value={user.mobile}
                 onChangeText={(text) => handleChange('mobile', text)}
                 keyboardType="phone-pad"
               />
             ) : (
-              <Text style={styles.infoText}>{user.mobile}</Text>
+              <Text style={[styles.infoText, { color: colors.text }]}>{user.mobile}</Text>
             )}
           </View>
         </View>
 
         {/* Stats */}
-        <View style={styles.statsCard}>
-          <Text style={styles.statsTitle}>Appointments Booked</Text>
-          <Text style={styles.statsNumber}>{user.appointments}</Text>
-          <Text style={styles.statsSubtitle}>Since {user.joined}</Text>
+        <View style={[styles.statsCard, { backgroundColor: isDark ? '#1E293B' : '#E0F2FE' }]}>
+          <Text style={[styles.statsTitle, { color: colors.text }]}>Appointments Booked</Text>
+          <Text style={[styles.statsNumber, { color: colors.accent }]}>
+            {user.appointments}
+          </Text>
+          <Text style={[styles.statsSubtitle, { color: colors.subtext }]}>
+            Since {user.joined}
+          </Text>
         </View>
 
         {/* Preferences */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>App Preferences</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>App Preferences</Text>
           <View style={styles.prefItem}>
-            <Text style={styles.prefLabel}>Notification</Text>
-            <Text style={styles.prefValue}>Enabled</Text>
+            <Text style={[styles.prefLabel, { color: colors.text }]}>Notification</Text>
+            <Text style={[styles.prefValue, { color: colors.subtext }]}>Enabled</Text>
           </View>
           <View style={styles.prefItem}>
-            <Text style={styles.prefLabel}>Language</Text>
-            <Text style={styles.prefValue}>English</Text>
+            <Text style={[styles.prefLabel, { color: colors.text }]}>Language</Text>
+            <Text style={[styles.prefValue, { color: colors.subtext }]}>English</Text>
           </View>
           <View style={styles.prefItem}>
-            <Text style={styles.prefLabel}>App Theme</Text>
-            <Text style={styles.prefValue}>Light</Text>
+            <Text style={[styles.prefLabel, { color: colors.text }]}>App Theme</Text>
+            <Text style={[styles.prefValue, { color: colors.subtext }]}>
+              {isDark ? 'Dark' : 'Light'}
+            </Text>
           </View>
         </View>
 
-        {/* Spacer */}
         <View style={{ height: 100 }} />
       </ScrollView>
 
       {/* Logout */}
       <View style={styles.logoutContainer}>
-        <TouchableOpacity style={styles.logoutButton} onPress={() => console.log('Logging out')}>
+        <TouchableOpacity
+          style={[styles.logoutButton, { backgroundColor: '#FF3B30' }]}
+          onPress={() => console.log('Logging out')}
+        >
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
-}
+});
+
+export default ProfileScreen;
 
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    backgroundColor: '#fff',
-    paddingTop:30,
+    paddingTop: 30,
   },
   scrollContent: {
     padding: 20,
@@ -144,11 +169,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     borderBottomWidth: 1,
-    borderColor: '#ccc',
   },
   location: {
     fontSize: 14,
-    color: '#666',
     marginTop: 4,
   },
   section: {
@@ -167,17 +190,14 @@ const styles = StyleSheet.create({
   infoText: {
     marginLeft: 8,
     fontSize: 15,
-    color: '#333',
   },
   input: {
     marginLeft: 8,
     fontSize: 15,
     borderBottomWidth: 1,
-    borderColor: '#ccc',
     flex: 1,
   },
   statsCard: {
-    backgroundColor: '#f0f9ff',
     padding: 20,
     borderRadius: 12,
     alignItems: 'center',
@@ -185,17 +205,14 @@ const styles = StyleSheet.create({
   },
   statsTitle: {
     fontSize: 16,
-    color: '#333',
   },
   statsNumber: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#007AFF',
     marginVertical: 6,
   },
   statsSubtitle: {
     fontSize: 13,
-    color: '#666',
   },
   prefItem: {
     flexDirection: 'row',
@@ -204,11 +221,9 @@ const styles = StyleSheet.create({
   },
   prefLabel: {
     fontSize: 15,
-    color: '#444',
   },
   prefValue: {
     fontSize: 15,
-    color: '#888',
   },
   logoutContainer: {
     position: 'absolute',
@@ -217,7 +232,6 @@ const styles = StyleSheet.create({
     right: 20,
   },
   logoutButton: {
-    backgroundColor: '#FF3B30',
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: 'center',

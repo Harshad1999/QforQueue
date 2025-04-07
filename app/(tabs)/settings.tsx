@@ -9,20 +9,30 @@ import {
 } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { Ionicons, Feather } from '@expo/vector-icons';
+import { observer } from 'mobx-react-lite';
+import { stores } from '@/core-stores';
+import { useThemeStyles } from '@/hooks/useThemeStyles';
 
-const SettingsScreen = () => {
+const SettingsScreen = observer(() => {
   const [radius, setRadius] = useState(300); // in meters
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const { colors, isDark } = useThemeStyles();
+
+  const handleToggleTheme = () => {
+    stores.themeStore.setTheme(isDark ? 'light' : 'dark');
+  };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Search Radius */}
-      <View style={styles.card}>
+      <View style={[styles.card, { backgroundColor: colors.card }]}>
         <View style={styles.cardHeader}>
-          <Ionicons name="location-outline" size={20} color="#4F46E5" />
-          <Text style={styles.cardTitle}>Search Radius</Text>
+          <Ionicons name="location-outline" size={20} color={colors.primary} />
+          <Text style={[styles.cardTitle, { color: colors.text }]}>Search Radius</Text>
         </View>
-        <Text style={styles.label}>Nearby Radius: {radius} meters</Text>
+        <Text style={[styles.label, { color: colors.text }]}>
+          Nearby Radius: {radius} meters
+        </Text>
         <Slider
           style={{ width: '100%', height: 40 }}
           minimumValue={100}
@@ -30,55 +40,73 @@ const SettingsScreen = () => {
           step={100}
           value={radius}
           onValueChange={(value) => setRadius(value)}
-          minimumTrackTintColor="#4F46E5"
-          maximumTrackTintColor="#ccc"
-          thumbTintColor={Platform.OS === 'android' ? '#4F46E5' : undefined}
+          minimumTrackTintColor={colors.primary}
+          maximumTrackTintColor={colors.border}
+          thumbTintColor={Platform.OS === 'android' ? colors.primary : undefined}
         />
       </View>
 
       {/* Notifications */}
-      <View style={styles.card}>
+      <View style={[styles.card, { backgroundColor: colors.card }]}>
         <View style={styles.cardHeader}>
-          <Ionicons name="notifications-outline" size={20} color="#10B981" />
-          <Text style={styles.cardTitle}>Notifications</Text>
+          <Ionicons name="notifications-outline" size={20} color={colors.success} />
+          <Text style={[styles.cardTitle, { color: colors.text }]}>Notifications</Text>
         </View>
         <View style={styles.toggleRow}>
-          <Text style={styles.label}>Enable Push Notifications</Text>
+          <Text style={[styles.label, { color: colors.text }]}>
+            Enable Push Notifications
+          </Text>
           <Switch
             value={notificationsEnabled}
             onValueChange={setNotificationsEnabled}
-            trackColor={{ false: '#ccc', true: '#10B981' }}
-            thumbColor={Platform.OS === 'android' ? '#fff' : undefined}
+            trackColor={{ false: colors.border, true: colors.success }}
+            thumbColor={Platform.OS === 'android' ? colors.background : undefined}
+          />
+        </View>
+      </View>
+
+      {/* Appearance - Theme Toggle */}
+      <View style={[styles.card, { backgroundColor: colors.card }]}>
+        <View style={styles.cardHeader}>
+          <Ionicons name="moon-outline" size={20} color={colors.accent} />
+          <Text style={[styles.cardTitle, { color: colors.text }]}>Appearance</Text>
+        </View>
+        <View style={styles.toggleRow}>
+          <Text style={[styles.label, { color: colors.text }]}>Dark Mode</Text>
+          <Switch
+            value={isDark}
+            onValueChange={handleToggleTheme}
+            trackColor={{ false: colors.border, true: colors.accent }}
+            thumbColor={Platform.OS === 'android' ? colors.background : undefined}
           />
         </View>
       </View>
 
       {/* Account Section */}
-      <View style={styles.card}>
+      <View style={[styles.card, { backgroundColor: colors.card }]}>
         <View style={styles.cardHeader}>
-          <Feather name="user" size={20} color="#6366F1" />
-          <Text style={styles.cardTitle}>Account</Text>
+          <Feather name="user" size={20} color={colors.primary} />
+          <Text style={[styles.cardTitle, { color: colors.text }]}>Account</Text>
         </View>
-        <Text style={styles.label}>Manage your account settings</Text>
-        {/* You can add Logout, Change Password etc. here */}
+        <Text style={[styles.label, { color: colors.text }]}>
+          Manage your account settings
+        </Text>
       </View>
 
       <View style={{ height: 40 }} />
     </ScrollView>
   );
-};
+});
 
 export default SettingsScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
     padding: 16,
-    paddingTop:30
+    paddingTop: 30,
   },
   card: {
-    backgroundColor: '#fff',
     padding: 16,
     borderRadius: 16,
     marginBottom: 20,
@@ -97,11 +125,9 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#111827',
   },
   label: {
     fontSize: 14,
-    color: '#374151',
     marginBottom: 12,
   },
   toggleRow: {

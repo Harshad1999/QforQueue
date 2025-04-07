@@ -1,13 +1,24 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Image } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native';
+import { useRouter } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
 import { mockDB } from '@/data/mock';
 import { stores } from '@/core-stores';
+import { useThemeStyles } from '@/hooks/useThemeStyles';
+import { observer } from 'mobx-react-lite';
 
-export default function RegisterScreen() {
+    const RegisterScreen = observer(() => {
   const router = useRouter();
-const{isBusinessOwner} = stores
+  const { isBusinessOwner } = stores;
+  const { colors, isDark } = useThemeStyles();
+
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -16,30 +27,31 @@ const{isBusinessOwner} = stores
     businessName: '',
     businessType: '',
   });
+
   const [error, setError] = useState('');
 
   const handleRegister = () => {
     try {
-      // Basic validation
       if (!formData.fullName || !formData.email || !formData.password) {
         setError('Please fill in all required fields');
         return;
       }
 
-      if (isBusinessOwner && (!formData.businessName || !formData.businessType || !formData.pincode)) {
+      if (
+        isBusinessOwner &&
+        (!formData.businessName || !formData.businessType || !formData.pincode)
+      ) {
         setError('Please fill in all business details');
         return;
       }
 
-      // Create user
       const newUser = mockDB.createUser({
         fullName: formData.fullName,
         email: formData.email,
-        isBusinessOwner: isBusinessOwner ,
+        isBusinessOwner,
         pincode: formData.pincode,
       });
 
-      // If owner, create business
       if (isBusinessOwner) {
         mockDB.createBusiness({
           ownerId: newUser.id,
@@ -52,14 +64,14 @@ const{isBusinessOwner} = stores
           },
           address: '',
           status: 'open',
-          imageUrl: 'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=1200',
+          imageUrl:
+            'https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=1200',
           description: '',
           services: [],
         });
       }
 
-      // Navigate to appropriate screen
-      // router.replace(isOwner ? '/business-dashboard/' : '/');
+      // router.replace(isBusinessOwner ? '/business-dashboard/' : '/');
     } catch (err) {
       setError('An error occurred during registration');
       console.error(err);
@@ -67,107 +79,86 @@ const{isBusinessOwner} = stores
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      contentContainerStyle={styles.content}
+    >
       <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-        <ArrowLeft size={24} color="#1a73e8" />
+        <ArrowLeft size={24} color={colors.accent} />
       </TouchableOpacity>
 
       <View style={styles.header}>
-        <Text style={styles.title}>Create Account</Text>
-        <Text style={styles.subtitle}>
+        <Text style={[styles.title, { color: colors.accent }]}>
+          Create Account
+        </Text>
+        <Text style={[styles.subtitle, { color: colors.subtext }]}>
           {isBusinessOwner ? 'Register your business' : 'Join as a customer'}
         </Text>
       </View>
 
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
+      {error ? (
+        <Text style={[styles.errorText, {
+          backgroundColor: isDark ? '#7f1d1d' : '#fee2e2',
+          color: isDark ? '#fca5a5' : '#dc2626',
+        }]}>
+          {error}
+        </Text>
+      ) : null}
 
       <View style={styles.form}>
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Full Name</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your full name"
-            placeholderTextColor="#999"
-            value={formData.fullName}
-            onChangeText={(text) => setFormData({ ...formData, fullName: text })}
-          />
-        </View>
+        {[
+          { label: 'Full Name', key: 'fullName', placeholder: 'Enter your full name' },
+          { label: 'Email', key: 'email', placeholder: 'Enter your email', keyboardType: 'email-address' },
+          { label: 'Password', key: 'password', placeholder: 'Choose a password', secureTextEntry: true },
+          { label: 'PINCODE', key: 'pincode', placeholder: 'Enter your PINCODE', keyboardType: 'number-pad' },
+          ...(isBusinessOwner
+            ? [
+                { label: 'Business Name', key: 'businessName', placeholder: 'Enter your business name' },
+                { label: 'Business Type', key: 'businessType', placeholder: 'barbershop or clinic' },
+              ]
+            : []),
+        ].map((field) => (
+          <View style={styles.inputGroup} key={field.key}>
+            <Text style={[styles.label, { color: colors.text }]}>{field.label}</Text>
+            <TextInput
+              style={[
+                styles.input,
+                {
+                  backgroundColor: colors.card,
+                  color: colors.text,
+                  borderColor: colors.border,
+                },
+              ]}
+              placeholder={field.placeholder}
+              placeholderTextColor={colors.subtext}
+              value={formData[field.key as keyof typeof formData]}
+              onChangeText={(text) =>
+                setFormData({ ...formData, [field.key]: text })
+              }
+              keyboardType={field.keyboardType}
+              secureTextEntry={field.secureTextEntry}
+              autoCapitalize="none"
+            />
+          </View>
+        ))}
 
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Email</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your email"
-            placeholderTextColor="#999"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            value={formData.email}
-            onChangeText={(text) => setFormData({ ...formData, email: text })}
-          />
-        </View>
-
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Password</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Choose a password"
-            placeholderTextColor="#999"
-            secureTextEntry
-            value={formData.password}
-            onChangeText={(text) => setFormData({ ...formData, password: text })}
-          />
-        </View>
-
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>PINCODE</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your PINCODE"
-            placeholderTextColor="#999"
-            keyboardType="number-pad"
-            value={formData.pincode}
-            onChangeText={(text) => setFormData({ ...formData, pincode: text })}
-          />
-        </View>
-
-        {isBusinessOwner && (
-          <>
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Business Name</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Enter your business name"
-                placeholderTextColor="#999"
-                value={formData.businessName}
-                onChangeText={(text) => setFormData({ ...formData, businessName: text })}
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Business Type</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="barbershop or clinic"
-                placeholderTextColor="#999"
-                value={formData.businessType}
-                onChangeText={(text) => setFormData({ ...formData, businessType: text })}
-              />
-            </View>
-          </>
-        )}
-
-        <TouchableOpacity style={styles.button} onPress={handleRegister}>
-          <Text style={styles.buttonText}>Create Account</Text>
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: colors.accent }]}
+          onPress={handleRegister}
+        >
+          <Text style={[styles.buttonText, { color: '#fff' }]}>
+            Create Account
+          </Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
   );
-}
+});
+export default RegisterScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   content: {
     padding: 20,
@@ -182,21 +173,17 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: 'Inter-Bold',
     fontSize: 32,
-    color: '#1a73e8',
     marginBottom: 8,
   },
   subtitle: {
     fontFamily: 'Inter-Regular',
     fontSize: 18,
-    color: '#666',
   },
   errorText: {
     fontFamily: 'Inter-Regular',
     fontSize: 14,
-    color: '#dc2626',
     marginBottom: 16,
     padding: 12,
-    backgroundColor: '#fee2e2',
     borderRadius: 8,
   },
   form: {
@@ -208,19 +195,15 @@ const styles = StyleSheet.create({
   label: {
     fontFamily: 'Inter-Medium',
     fontSize: 16,
-    color: '#333',
   },
   input: {
     fontFamily: 'Inter-Regular',
     fontSize: 16,
     padding: 12,
     borderRadius: 8,
-    backgroundColor: '#f8f9fa',
     borderWidth: 1,
-    borderColor: '#e1e3e6',
   },
   button: {
-    backgroundColor: '#1a73e8',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
@@ -229,6 +212,5 @@ const styles = StyleSheet.create({
   buttonText: {
     fontFamily: 'Inter-SemiBold',
     fontSize: 18,
-    color: '#fff',
   },
 });

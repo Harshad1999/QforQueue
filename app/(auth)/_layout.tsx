@@ -1,20 +1,18 @@
+import React, { useEffect } from 'react';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-
+import * as SplashScreen from 'expo-splash-screen';
+import { useFonts } from 'expo-font';
 import 'react-native-reanimated';
+import { observer } from 'mobx-react-lite';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
-import React from 'react';
+import { stores } from '@/core-stores'; // <-- use MobX store
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
+// Prevent splash from auto-hiding before fonts load
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
+const AuthLayout = observer(() => {
   const [loaded] = useFonts({
     SpaceMono: require('../../assets/fonts/SpaceMono-Regular.ttf'),
   });
@@ -29,14 +27,18 @@ export default function RootLayout() {
     return null;
   }
 
+  const theme = stores.themeStore.theme === 'dark' ? DarkTheme : DefaultTheme;
+
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={theme}>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="register" options={{ headerShown: false }} />
       </Stack>
-      <StatusBar style="auto" />
+      <StatusBar style={stores.themeStore.theme === 'dark' ? 'light' : 'dark'} />
     </ThemeProvider>
   );
-}
+});
+
+export default AuthLayout;
