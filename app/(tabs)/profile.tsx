@@ -11,8 +11,12 @@ import {
 import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons';
 import { useThemeStyles } from '@/hooks/useThemeStyles';
 import { observer } from 'mobx-react-lite';
+import { stores } from '@/core-stores';
+import { router } from 'expo-router';
+
 
 const ProfileScreen = observer(() => {
+  const { isBusinessOwner } = stores;
   const [editMode, setEditMode] = useState(false);
   const [user, setUser] = useState({
     name: 'John Doe',
@@ -90,16 +94,35 @@ const ProfileScreen = observer(() => {
           </View>
         </View>
 
-        {/* Stats */}
         <View style={[styles.statsCard, { backgroundColor: isDark ? '#1E293B' : '#E0F2FE' }]}>
-          <Text style={[styles.statsTitle, { color: colors.text }]}>Appointments Booked</Text>
-          <Text style={[styles.statsNumber, { color: colors.accent }]}>
-            {user.appointments}
-          </Text>
-          <Text style={[styles.statsSubtitle, { color: colors.subtext }]}>
-            Since {user.joined}
-          </Text>
-        </View>
+              <Text style={[styles.statsTitle, { color: colors.text }]}>{isBusinessOwner?"Appointments Handled":"Appointments Handled"}</Text>
+              <Text style={[styles.statsNumber, { color: colors.accent }]}>
+                {user.appointments}
+              </Text>
+              <Text style={[styles.statsSubtitle, { color: colors.subtext }]}>
+                Since {user.joined}
+              </Text>
+            </View>
+        {/* Business Owner Only */}
+        {isBusinessOwner && (
+          <>
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Business Details</Text>
+              <View style={styles.prefItem}>
+                <Text style={[styles.prefLabel, { color: colors.text }]}>Business Name</Text>
+                <Text style={[styles.prefValue, { color: colors.subtext }]}>Sample Salon</Text>
+              </View>
+              <View style={styles.prefItem}>
+                <Text style={[styles.prefLabel, { color: colors.text }]}>Category</Text>
+                <Text style={[styles.prefValue, { color: colors.subtext }]}>Hair & Beauty</Text>
+              </View>
+              <View style={styles.prefItem}>
+                <Text style={[styles.prefLabel, { color: colors.text }]}>Status</Text>
+                <Text style={[styles.prefValue, { color: 'green' }]}>Active</Text>
+              </View>
+            </View>
+          </>
+        )}
 
         {/* Preferences */}
         <View style={styles.section}>
@@ -127,7 +150,9 @@ const ProfileScreen = observer(() => {
       <View style={styles.logoutContainer}>
         <TouchableOpacity
           style={[styles.logoutButton, { backgroundColor: '#FF3B30' }]}
-          onPress={() => console.log('Logging out')}
+          onPress={() => {stores.setIsLoggedIn(false)
+            router.push('/(auth)');
+          }}
         >
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>

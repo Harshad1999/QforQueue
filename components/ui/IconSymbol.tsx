@@ -10,12 +10,14 @@ export function IconSymbol({
   size = 24,
   color,
   style,
+  onPress
 }: {
   name: React.ComponentProps<typeof Ionicons>['name'];
   size?: number;
   color: string | OpaqueColorValue;
   style?: StyleProp<TextStyle>;
   weight?: SymbolWeight;
+  onPress?: ()=>void
 }) {
-  return <Ionicons color={color} size={size} name={name} style={style} />;
+  return <Ionicons color={color} size={size} name={name} style={style} onPress={onPress}/>;
 }

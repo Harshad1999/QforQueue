@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 
 export interface User {
   id: string;
@@ -49,6 +48,58 @@ export interface Review {
   comment: string;
   createdAt: string;
 }
+
+export interface BusinessInfo {
+  name: string;
+  isOnline: boolean;
+  onBreak: boolean;
+}
+
+export interface QueueStats {
+  currentToken: string;
+  nextToken: string;
+}
+
+export interface TokenData {
+  id: number;
+  token: string;
+  name: string;
+  age: number;
+  gender: 'Male' | 'Female' | 'Other';
+}
+
+export interface DashboardData {
+  businessInfo: BusinessInfo;
+  queueStats: QueueStats;
+  tokens: TokenData[];
+}
+// data/dummyDashboardData.ts
+export const dashboardData:DashboardData = {
+  businessInfo: {
+    name: "John's Barber Shop",
+    isOnline: true,
+    onBreak: false,
+  },
+  queueStats: {
+    currentToken: 'A12',
+    nextToken: 'A13',
+  },
+  tokens: [
+    { id: 1, token: 'A10', name: 'Alice', age: 29, gender: 'Female' },
+    { id: 2, token: 'A11', name: 'Bob', age: 34, gender: 'Male' },
+    { id: 3, token: 'A12', name: 'Charlie', age: 41, gender: 'Male' },
+    { id: 4, token: 'A13', name: 'David', age: 26, gender: 'Male' },
+    { id: 5, token: 'A14', name: 'Emma', age: 22, gender: 'Female' },
+    { id: 6, token: 'A15', name: 'Frank', age: 37, gender: 'Male' },
+    { id: 7, token: 'A16', name: 'Grace', age: 30, gender: 'Female' },
+    { id: 8, token: 'A17', name: 'Harry', age: 45, gender: 'Male' },
+    { id: 9, token: 'A18', name: 'Ivy', age: 33, gender: 'Female' },
+    { id: 10, token: 'A19', name: 'Jack', age: 40, gender: 'Male' },
+    { id: 11, token: 'A20', name: 'Kira', age: 27, gender: 'Female' },
+    { id: 12, token: 'A21', name: 'Leo', age: 36, gender: 'Male' },
+    { id: 13, token: 'A22', name: 'Mia', age: 24, gender: 'Female' },
+  ]
+};
 
 // Mock Data
 export const mockUsers: User[] = [

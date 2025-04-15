@@ -34,13 +34,15 @@ const RootLayout = observer(() => {
   return (
     <ThemeProvider value={navigationTheme}>
       <View style={{ flex: 1, paddingTop: process.env.EXPO_OS === 'ios' ? 30 : 5 }}>
-      <StatusBar style={isDark ? 'light' : 'dark'} backgroundColor={navigationTheme.colors.background} />
+        <StatusBar style={isDark ? 'light' : 'dark'} backgroundColor={navigationTheme.colors.background} />
 
         <Stack>
-          {stores.isLoggedin === false && (
+          {stores.isLoggedin === false ? (
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          )}
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          ) : (
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          )
+          }
           <Stack.Screen name="+not-found" />
         </Stack>
       </View>

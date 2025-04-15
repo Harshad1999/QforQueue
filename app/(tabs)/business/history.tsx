@@ -5,9 +5,13 @@ import {
   FlatList,
   TouchableOpacity,
   StyleSheet,
+  SafeAreaView,
 } from 'react-native';
+import { IconSymbol } from '@/components/ui/IconSymbol';
+
 import { useThemeStyles } from '@/hooks/useThemeStyles';
 import { observer } from 'mobx-react-lite';
+import { router } from 'expo-router';
 
 const FILTERS = ['Weekly', 'Monthly', 'Yearly'];
 
@@ -27,77 +31,100 @@ const HistoryScreen = observer(() => {
   const filteredData = mockHistoryData; // Replace with real filtering logic
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.title, { color: colors.text }]}>
-        Appointment History
-      </Text>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
+      <View style={styles.scrollContainer}>
+        <View style={styles.header}>
+          <IconSymbol name="arrow-back" size={24} color={colors.icon} onPress={() => router.back()} />
+          <Text style={[styles.headerTitle, { color: colors.text }]}>History</Text>
+        </View>
 
-      <View style={styles.filterRow}>
-        {FILTERS.map((filter) => (
-          <TouchableOpacity
-            key={filter}
-            onPress={() => setSelectedFilter(filter)}
-            style={[
-              styles.filterButton,
-              {
-                backgroundColor:
-                  selectedFilter === filter ? colors.accent : colors.card,
-              },
-            ]}
-          >
-            <Text
-              style={{
-                color: selectedFilter === filter ? '#fff' : colors.text,
-                fontWeight: '600',
-              }}
+
+        <View style={styles.filterRow}>
+          {FILTERS.map((filter) => (
+            <TouchableOpacity
+              key={filter}
+              onPress={() => setSelectedFilter(filter)}
+              style={[
+                styles.filterButton,
+                {
+                  backgroundColor:
+                    selectedFilter === filter ? colors.accent : colors.card,
+                },
+              ]}
             >
-              {filter}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+              <Text
+                style={{
+                  color: selectedFilter === filter ? '#fff' : colors.text,
+                  fontWeight: '600',
+                }}
+              >
+                {filter}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
 
-      <FlatList
-        data={filteredData}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingBottom: 16 }}
-        renderItem={({ item }) => (
-          <View
-            style={[
-              styles.card,
-              {
-                backgroundColor: colors.card,
-                borderColor: colors.border,
-                shadowColor: colors.text,
-              },
-            ]}
-          >
-            <Text style={[styles.tokenText, { color: colors.accent }]}>
-              Token: {item.token}
-            </Text>
-            <Text style={[styles.infoText, { color: colors.text }]}>
-              Customer: {item.customer}
-            </Text>
-            <Text style={[styles.infoText, { color: colors.text }]}>
-              Service: {item.service}
-            </Text>
-            <Text style={[styles.infoText, { color: colors.subtext }]}>
-              Date: {item.date}
-            </Text>
-            <Text style={[styles.statusText, { color: colors.subtext }]}>
-              Status: {item.status}
-            </Text>
-          </View>
-        )}
-      />
-    </View>
+        <FlatList
+          data={filteredData}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{ paddingBottom: 16 }}
+          renderItem={({ item }) => (
+            <View
+              style={[
+                styles.card,
+                {
+                  backgroundColor: colors.card,
+                  borderColor: colors.border,
+                  shadowColor: colors.text,
+                },
+              ]}
+            >
+              <Text style={[styles.tokenText, { color: colors.accent }]}>
+                Token: {item.token}
+              </Text>
+              <Text style={[styles.infoText, { color: colors.text }]}>
+                Customer: {item.customer}
+              </Text>
+              <Text style={[styles.infoText, { color: colors.text }]}>
+                Service: {item.service}
+              </Text>
+              <Text style={[styles.infoText, { color: colors.subtext }]}>
+                Date: {item.date}
+              </Text>
+              <Text style={[styles.statusText, { color: colors.subtext }]}>
+                Status: {item.status}
+              </Text>
+            </View>
+          )}
+        />
+      </View>
+    </SafeAreaView>
   );
 });
 
 const styles = StyleSheet.create({
-  container: {
+  // container: {
+  //   flex: 1,
+  //   padding: 16,
+  //   paddingTop:48
+  // },
+  safeArea: {
     flex: 1,
-    padding: 16,
+  },
+  scrollContainer: {
+    padding: 20,
+    paddingTop: 48,
+    flexGrow: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: '600',
+    marginLeft: 12,
   },
   title: {
     fontSize: 26,
