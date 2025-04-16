@@ -68,7 +68,7 @@ const Login = observer(() => {
 
     stores.setIsLoggedIn(true);
     setError('');
-    router.push('/(tabs)/home');
+    isBusinessOwner?router.push('/(tabs)/business'):router.push('/(tabs)/home');
   };
 
   const OR = () => (

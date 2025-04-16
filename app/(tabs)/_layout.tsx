@@ -31,12 +31,11 @@ const TabLayout = observer(() => {
       }}
     >
       {/* Customer-only tabs */}
-      {!isBusiness && (
-        <>
           <Tabs.Screen
             name="home"
             options={{
               title: 'Home',
+              href:!isBusiness ?'/(tabs)/home': null,
               tabBarIcon: ({ color }) => (
                 <IconSymbol size={28} name={isIos ? 'house' : 'home'} color={color} />
               ),
@@ -46,26 +45,26 @@ const TabLayout = observer(() => {
             name="my-appointments"
             options={{
               title: 'My Bookings',
+              href:!isBusiness ?'/(tabs)/my-appointments': null,
               tabBarIcon: ({ color }) => (
                 <IconSymbol size={28} name="ticket" color={color} />
               ),
             }}
           />
-        </>
-      )}
 
       {/* Business-only tab */}
-      {isBusiness && (
+    
         <Tabs.Screen
           name="business"
           options={{
             title: 'Business',
+            href:isBusiness ?'/(tabs)/business': null,
             tabBarIcon: ({ color }) => (
               <IconSymbol size={28} name="storefront" color={color} />
             ),
           }}
         />
-      )}
+      
 
       {/* Shared tabs */}
       <Tabs.Screen

@@ -40,10 +40,7 @@ const HomeScreen = observer(() => {
     }, 1000);
   }, []);
 
-  useEffect(() => {
-    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true);
-    return () => backHandler.remove();
-  }, []);
+ 
 
   const renderBusinessCard = ({ item }: { item: Business }) => (
     <TouchableOpacity

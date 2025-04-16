@@ -17,16 +17,6 @@ const AuthLayout = observer(() => {
     SpaceMono: require('../../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
-
   const theme = stores.themeStore.theme === 'dark' ? DarkTheme : DefaultTheme;
 
   return (

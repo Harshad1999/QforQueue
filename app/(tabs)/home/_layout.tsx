@@ -1,5 +1,5 @@
-import React from 'react';
-import { Platform, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { BackHandler, Platform, View } from 'react-native';
 import { Stack, router } from 'expo-router';
 import CustomHeader from '@/components/CustomHeader';
 import { IconSymbol } from '@/components/ui/IconSymbol';
@@ -10,7 +10,10 @@ import { observer } from 'mobx-react-lite';
   
   const isWeb = Platform.OS === 'web';
   const { colors } = useThemeStyles();
-
+ useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => true);
+    return () => backHandler.remove();
+  }, []);
   return (
     <View style={{ flex: 1, backgroundColor: colors.background, paddingBottom: process.env.EXPO_OS === 'ios' ? 80 : 0 }}>
       <Stack>
