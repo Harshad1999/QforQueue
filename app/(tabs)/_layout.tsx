@@ -8,6 +8,7 @@ import TabBarBackground from '@/components/ui/TabBarBackground';
 import { useThemeStyles } from '@/hooks/useThemeStyles';
 import { observer } from 'mobx-react-lite';
 import { stores } from '@/core-stores';
+import Octicons from '@expo/vector-icons/Octicons';
 
 const TabLayout = observer(() => {
   const { colors } = useThemeStyles();
@@ -81,7 +82,7 @@ const TabLayout = observer(() => {
         options={{
           title: 'Setting',
           tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="settings" color={color} />
+            <Octicons size={28} name="gear" color={color} />
           ),
         }}
       />
