@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View } from 'react-native';
+import { SafeAreaView } from 'react-native';
 import { ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -33,8 +33,11 @@ const RootLayout = observer(() => {
 
   return (
     <ThemeProvider value={navigationTheme}>
-      <View style={{ flex: 1, paddingTop: process.env.EXPO_OS === 'ios' ? 30 : 5 }}>
-        <StatusBar style={isDark ? 'light' : 'dark'} backgroundColor={navigationTheme.colors.background} />
+       <SafeAreaView style={{ flex: 1, backgroundColor: navigationTheme.colors.background }}>
+    <StatusBar
+      style={isDark ? 'light' : 'dark'}
+      backgroundColor={navigationTheme.colors.background}
+    />
 
         <Stack>
           {stores.isLoggedin === false ? (
@@ -45,7 +48,7 @@ const RootLayout = observer(() => {
           }
           <Stack.Screen name="+not-found" />
         </Stack>
-      </View>
+      </SafeAreaView>
     </ThemeProvider>
   );
 });
